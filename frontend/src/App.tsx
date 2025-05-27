@@ -1,5 +1,10 @@
 import { Routes, Route } from "react-router-dom";
-import { SignIn, SignUp, UserButton, SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
+import { SignIn, SignUp, SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
+import Navbar from "./components/Navbar";
+import Homepage from "./pages/HomePage";
+import { Toaster } from "react-hot-toast";
+import Landing from "./components/landing";
+
 
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -12,23 +17,30 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+
   return (
+    
+    <><Navbar />
+    <Landing />
     <Routes>
+      
       <Route path="/sign-in" element={<SignIn routing="path" path="/sign-in" />} />
       <Route path="/sign-up" element={<SignUp routing="path" path="/sign-up" />} />
       <Route
         path="/"
-        element={
-          <ProtectedRoute>
-            <div className="p-4">
-              <h1 className="text-2xl font-bold">Welcome to the Chat App!</h1>
-              <UserButton afterSignOutUrl="/sign-in" />
-            </div>
+        element={<ProtectedRoute>
+          <div>
+
             
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
+            <Homepage />
+
+          </div>
+
+
+          {/* <UserButton afterSignOutUrl="/sign-in" /> */}
+        </ProtectedRoute>} />
+
+    </Routes><Toaster /></>
   );
 }
 
