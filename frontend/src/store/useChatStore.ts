@@ -94,5 +94,10 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         toast.error("An unexpected error occurred while sending the message.");
       }
     }
-  }
+  },
+
+
+  
+
+
 }));

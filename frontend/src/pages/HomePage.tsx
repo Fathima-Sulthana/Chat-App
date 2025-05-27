@@ -1,5 +1,5 @@
 import Chat from "../components/Chat";
-import NOChatSelected from "../components/NOChatSelected";
+import NoChatSelected from "../components/NoChatSelected";
 import Sidebar from "../components/Sidebar";
 import { useChatStore } from "../store/useChatStore"
 
@@ -16,7 +16,7 @@ function Homepage() {
 
             <Sidebar />
 
-            { !selectedUser ? <NOChatSelected /> : <Chat /> }
+            { !selectedUser ? <NoChatSelected /> : <Chat /> }
 
           </div>
         </div>
