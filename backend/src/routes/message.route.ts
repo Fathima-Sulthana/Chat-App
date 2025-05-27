@@ -1,5 +1,5 @@
 import express, { Router } from 'express';
-import { getMessages, getUsersForSidebar } from '../controllers/message.controller';
+import { getMessages, getUsersForSidebar, sendMessage } from '../controllers/message.controller';
 import { requireAuth } from '@clerk/express';
 
 const router = Router();

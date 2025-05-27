@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import User from "../models/user.model";
 import Message from '../models/message.model';
+import { v2 as cloudinary } from "cloudinary";
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -37,5 +38,33 @@ export const getMessages = async (req: Request, res: Response) => {
     } catch (error) {
         console.log("Error in getMessages controller: ", error)
         res.status(500).json({error: "Internal server Error"});
+    }
+};
+
+export const sendMessage = async (req: Request, res: Response) => {
+    try {
+        const {text, image} = req.body;
+        const {id: receiverId} = req.params;
+        const senderId = req.auth?.userId;
+
+        let imageUrl;
+        if(image){
+            const uploadResponse = await cloudinary.uploader.upload(image);
+            imageUrl = uploadResponse.secure_url;
+        }
+
+        const newMessage = new Message({
+            senderId,
+            receiverId,
+            text,
+            image: imageUrl,
+        });
+
+        await newMessage.save();
+
+        res.status(201).json(newMessage);
+    } catch (error) {
+        console.log("error in sendMessage controller: ", error);
+        res.status(500).json({error: "Internal Server error"});
     }
 };
