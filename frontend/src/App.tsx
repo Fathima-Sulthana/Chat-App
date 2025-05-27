@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { SignIn, SignUp, UserButton, SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
 
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return (
     <>
@@ -23,6 +24,7 @@ function App() {
               <h1 className="text-2xl font-bold">Welcome to the Chat App!</h1>
               <UserButton afterSignOutUrl="/sign-in" />
             </div>
+            
           </ProtectedRoute>
         }
       />
