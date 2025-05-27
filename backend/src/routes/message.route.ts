@@ -1,10 +1,13 @@
 import express, { Router } from 'express';
-import { getUsersForSidebar } from '../controllers/message.controller';
+import { getMessages, getUsersForSidebar } from '../controllers/message.controller';
 import { requireAuth } from '@clerk/express';
 
 const router = Router();
 
 router.get('/users', requireAuth(), getUsersForSidebar);
+router.get('/:id', requireAuth(), getMessages);
+
+router.post("/send/:id", sendMessage);
 
 
 export default router;
