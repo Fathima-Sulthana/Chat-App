@@ -2,16 +2,19 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { axioInstance } from "../lib/axios";
 import { AxiosError } from "axios";
+import type { ReactNode } from "react";
 
 interface Message {
   _id: string;
   senderId: string;
   receiverId: string;
   message: string;
+  image?: string;
   createdAt: string;
 }
 
 interface User {
+  fullName: ReactNode;
   _id: string;
   username: string;
   clerkId: string;
@@ -20,7 +23,9 @@ interface User {
 
 interface MessageInput {
   message: string;
+  image?: string; 
 }
+
 
 interface ChatStore {
   messages: Message[];

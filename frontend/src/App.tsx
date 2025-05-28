@@ -3,7 +3,7 @@ import { SignIn, SignUp, SignedIn, SignedOut, RedirectToSignIn } from "@clerk/cl
 import Navbar from "./components/Navbar";
 import Homepage from "./pages/HomePage";
 import { Toaster } from "react-hot-toast";
-import Landing from "./components/landing";
+import Landing from "./components/Landing";
 
 
 
