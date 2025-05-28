@@ -7,7 +7,7 @@ const router = Router();
 router.get('/users', requireAuth(), getUsersForSidebar);
 router.get('/:id', requireAuth(), getMessages);
 
-router.post("/send/:id", sendMessage);
+router.post("/send/:id", requireAuth(), sendMessage);
 
 
 export default router;

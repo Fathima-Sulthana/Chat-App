@@ -39,6 +39,7 @@ interface ChatStore {
   setSelectedUser: (user: User | null) => void;
   getMessages: (userId: string) => Promise<void>;
   sendMessage: (messageData: MessageInput) => Promise<void>;
+  addMessage: (message: Message) => void;
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -51,6 +52,11 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   isMessagesLoading: false,
   onlineUsers: [],
   setOnlineUsers: (users) => set({ onlineUsers: users }),
+
+  addMessage: (message) => {
+  const { messages } = get();
+  set({ messages: [...messages, message] });
+  },
 
   getUsers: async () => {
   set({ isUsersLoading: true });
@@ -92,7 +98,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   getMessages: async (userId: string) => {
     set({ isMessagesLoading: true });
     try {
-      const res = await axioInstance.get(`/message/${userId}`);
+      const res = await axioInstance.get(`message/${userId}`);
       set({ messages: res.data });
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -113,7 +119,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }
 
     try {
-      const res = await axioInstance.post(`/message/send/${selectedUser._id}`, messageData);
+      const res = await axioInstance.post(`message/send/${selectedUser._id}`, messageData);
       set({ messages: [...messages, res.data] });
     } catch (error) {
       if (error instanceof AxiosError) {

@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
 import SidebarSkeleton from "../components/skeletons/SidebarSkeleton";
 import { Users } from "lucide-react";
-import { useSocket } from "../context/SocketContext"; // 
+import { useSocket } from "../hooks/useSocket";
+ 
 
 function Sidebar() {
   const {

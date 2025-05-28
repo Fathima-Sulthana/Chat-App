@@ -3,18 +3,16 @@ import type { ChangeEvent, FormEvent } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { Image, Send, X } from "lucide-react";
 import toast from "react-hot-toast";
-
-interface MessageInput {
-  message: string;
-  image?: string; // optional image
-}
-
+import { useUser } from "@clerk/clerk-react";
+import { useSocket } from "../hooks/useSocket"; 
 
 const MessageInput = () => {
   const [text, setText] = useState<string>("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { sendMessage } = useChatStore();
+  const { sendMessage, addMessage, selectedUser } = useChatStore();
+  const { user } = useUser();
+  const { socket } = useSocket(); 
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -43,22 +41,46 @@ const MessageInput = () => {
     e.preventDefault();
     if (!text.trim() && !imagePreview) return;
 
-    try {
-      await sendMessage({
+    const optimisticMessage = {
+      _id: Date.now().toString(),
+      senderId: user?.id || "unknown",
+      receiverId: selectedUser?._id || "unknown",
+      message: text.trim(),
+      image: imagePreview ?? undefined,
+      createdAt: new Date().toISOString(),
+    };
+
+    
+    
+
+    
+    const payload = {
+  _id: optimisticMessage._id,
+  senderId: user?.id,
+  receiverId: selectedUser?._id,
   message: text.trim(),
   image: imagePreview ?? undefined,
-});
+};
 
+console.log("Sending message via socket:", payload);
+socket?.emit("send-message", payload);
+addMessage(optimisticMessage);
 
-
-      // Clear form
-      setText("");
-      setImagePreview(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+    try {
+      
+      await sendMessage({
+        message: text.trim(),
+        image: imagePreview ?? undefined,
+      });
     } catch (error) {
       console.error("Failed to send message:", error);
       toast.error("Failed to send message");
     }
+
+   
+    setText("");
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   return (
