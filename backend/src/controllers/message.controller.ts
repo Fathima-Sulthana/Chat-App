@@ -1,13 +1,14 @@
 import { Request, Response } from 'express';
 import User from "../models/user.model";
 import Message from '../models/message.model';
-import { v2 as cloudinary } from "cloudinary";
+import v2 from "../lib/cloudinary";
+const cloudinary = v2;
 
 declare module 'express-serve-static-core' {
     interface Request {
         auth?: {
             userId?: string;
-            // add other properties if needed
+            
         };
     }
 }

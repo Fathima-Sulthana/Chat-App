@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import Homepage from "./pages/HomePage";
 import { Toaster } from "react-hot-toast";
 import Landing from "./components/Landing";
+import { SocketProvider } from "./context/SocketContext";
 
 
 
@@ -20,7 +21,9 @@ function App() {
 
   return (
     
-    <><Navbar />
+    <>
+    <SocketProvider>
+    <Navbar />
     <Landing />
     <Routes>
       
@@ -40,7 +43,8 @@ function App() {
           {/* <UserButton afterSignOutUrl="/sign-in" /> */}
         </ProtectedRoute>} />
 
-    </Routes><Toaster /></>
+    </Routes><Toaster />
+    </SocketProvider></>
   );
 }
 

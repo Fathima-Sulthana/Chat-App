@@ -14,7 +14,7 @@ interface Message {
 }
 
 interface User {
-  fullName: ReactNode;
+  fullName: string;
   _id: string;
   username: string;
   clerkId: string;
@@ -33,6 +33,8 @@ interface ChatStore {
   selectedUser: User | null;
   isUsersLoading: boolean;
   isMessagesLoading: boolean;
+  onlineUsers: string[];
+  setOnlineUsers: (users: string[]) => void;
   getUsers: () => Promise<void>;
   setSelectedUser: (user: User | null) => void;
   getMessages: (userId: string) => Promise<void>;
@@ -40,27 +42,48 @@ interface ChatStore {
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
+
+  
   messages: [],
   users: [],
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
+  onlineUsers: [],
+  setOnlineUsers: (users) => set({ onlineUsers: users }),
 
   getUsers: async () => {
-    set({ isUsersLoading: true });
-    try {
-      const res = await axioInstance.get("/api/message/users");
-      set({ users: res.data });
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message || "Failed to fetch users");
-      } else {
-        toast.error("An unexpected error occurred while fetching users.");
-      }
-    } finally {
-      set({ isUsersLoading: false });
+  set({ isUsersLoading: true });
+  try {
+    const res = await axioInstance.get("/users");
+
+    type ApiUser = {
+      id: string;
+      username: string;
+      fullName: ReactNode;
+      profilePic?: string;
+    };
+
+    const formattedUsers = res.data.map((user: ApiUser) => ({
+      _id: user.id, // map id to _id to match frontend usage
+      username: user.username,
+      fullName: user.fullName,
+      clerkId: user.id,
+      profilePic: user.profilePic,
+    }));
+
+    set({ users: formattedUsers });
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      toast.error(error.response?.data?.message || "Failed to fetch users");
+    } else {
+      toast.error("An unexpected error occurred while fetching users.");
     }
-  },
+  } finally {
+    set({ isUsersLoading: false });
+  }
+},
+
 
   setSelectedUser: (user) => {
     set({ selectedUser: user });
@@ -69,7 +92,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   getMessages: async (userId: string) => {
     set({ isMessagesLoading: true });
     try {
-      const res = await axioInstance.get(`/api/message/${userId}`);
+      const res = await axioInstance.get(`/message/${userId}`);
       set({ messages: res.data });
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -90,7 +113,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }
 
     try {
-      const res = await axioInstance.post(`/api/message/send/${selectedUser._id}`, messageData);
+      const res = await axioInstance.post(`/message/send/${selectedUser._id}`, messageData);
       set({ messages: [...messages, res.data] });
     } catch (error) {
       if (error instanceof AxiosError) {
