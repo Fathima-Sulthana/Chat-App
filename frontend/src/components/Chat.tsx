@@ -5,6 +5,8 @@ import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { useUser } from "@clerk/clerk-react";
 import { useSocket } from "../hooks/useSocket";
+import { Volume2 } from "lucide-react"; 
+import { speakText } from "../lib/elevenlabs";
 
 function Chat() {
   const { messages, getMessages, isMessagesLoading, selectedUser, addMessage } = useChatStore();
@@ -105,6 +107,7 @@ function Chat() {
       <div className="chat-header mb-1">
         <time className="text-xs opacity-50 ml-1">{formatMessageTime(message.createdAt)}</time>
       </div>
+      <div className="flex items-center gap-2">
       <div className="chat-bubble flex flex-col">
         {message.image && (
           <img
@@ -114,6 +117,10 @@ function Chat() {
           />
         )}
         {message.text && <p>{message.text}</p>}
+      </div>
+      <button onClick={() => speakText(message.text)} className="text-zinc-400 hover:text-primary transition">
+        <Volume2 className="w-4 h-4" />
+      </button>
       </div>
     </div>
   );
