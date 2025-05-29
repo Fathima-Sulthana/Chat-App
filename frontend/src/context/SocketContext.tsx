@@ -3,8 +3,6 @@ import { io, Socket } from "socket.io-client";
 import { useUser } from "@clerk/clerk-react";
 import { useChatStore } from "../store/useChatStore";
 
-
-
 type SocketContextType = {
   socket: Socket | null;
   isConnected: boolean;
@@ -43,20 +41,12 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       setOnlineUsers(userList);
     });
 
-    newSocket.on("receive-message", (data) => {
-      console.log("Message received:", data);
+    newSocket.on("receive-message", (message) => {
+  if (message.senderId === user?.id) return;
+  addMessage(message);
+});
 
-      const message = {
-        _id: data._id || Date.now().toString(),
-        senderId: data.senderId,
-        receiverId: user.id,
-        message: data.message,
-        image: data.image || null,
-        createdAt: data.createdAt || new Date().toISOString(),
-      };
 
-      addMessage(message);
-    });
 
     return () => {
       newSocket.off("connect");

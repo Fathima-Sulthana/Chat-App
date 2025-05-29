@@ -4,15 +4,15 @@ import { useChatStore } from "../store/useChatStore";
 import { Image, Send, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { useUser } from "@clerk/clerk-react";
-import { useSocket } from "../hooks/useSocket"; 
+import { useSocket } from "../hooks/useSocket";
 
 const MessageInput = () => {
   const [text, setText] = useState<string>("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { sendMessage, addMessage, selectedUser } = useChatStore();
+  const { sendMessage, selectedUser } = useChatStore();
   const { user } = useUser();
-  const { socket } = useSocket(); 
+  const { socket } = useSocket();
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -45,31 +45,27 @@ const MessageInput = () => {
       _id: Date.now().toString(),
       senderId: user?.id || "unknown",
       receiverId: selectedUser?._id || "unknown",
-      message: text.trim(),
+      text: text.trim(),
       image: imagePreview ?? undefined,
       createdAt: new Date().toISOString(),
     };
 
     
-    
 
-    
     const payload = {
-  _id: optimisticMessage._id,
-  senderId: user?.id,
-  receiverId: selectedUser?._id,
-  message: text.trim(),
-  image: imagePreview ?? undefined,
-};
+      _id: optimisticMessage._id,
+      senderId: user?.id,
+      receiverId: selectedUser?._id,
+      text: text.trim(),
+      image: imagePreview ?? undefined,
+    };
 
-console.log("Sending message via socket:", payload);
-socket?.emit("send-message", payload);
-addMessage(optimisticMessage);
+    console.log("Sending message via socket:", payload);
+    socket?.emit("send-message", payload);
 
     try {
-      
       await sendMessage({
-        message: text.trim(),
+        text: text.trim(),
         image: imagePreview ?? undefined,
       });
     } catch (error) {
@@ -77,7 +73,6 @@ addMessage(optimisticMessage);
       toast.error("Failed to send message");
     }
 
-   
     setText("");
     setImagePreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";

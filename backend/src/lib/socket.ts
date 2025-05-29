@@ -24,67 +24,45 @@ io.on("connection", (socket) => {
 
   if (userId) {
     onlineUsers.set(userId, socket.id);
+    socket.join(userId); // ✅ Join the room with userId
     broadcastOnlineUsers();
   }
 
-
-    socket.on("send-message", (data) => {
-  const { _id, senderId, receiverId, message, image } = data;
+  socket.on("send-message", (data) => {
+  const { _id, senderId, receiverId, text, image } = data;
 
   console.log("📥 Received message data:", data);
 
-  if ((!message || message.trim() === "") && !image) return;
+  if ((!text || text.trim() === "") && !image) return;
 
-  const receiverSocketId = onlineUsers.get(receiverId);
   const newMessage = {
     _id,
     senderId,
     receiverId,
-    message,
+    text,
     image: image || null,
     createdAt: new Date().toISOString(),
   };
 
-  if (receiverSocketId) {
+  const receiverSocketId = onlineUsers.get(receiverId);
+
+  // ✅ Only send to receiver, NOT to sender
+  if (receiverSocketId && receiverSocketId !== socket.id) {
     io.to(receiverSocketId).emit("receive-message", newMessage);
   }
 });
 
 
-
-  // socket.on("send-message", ({ _id, senderId, receiverId, message, image }) => {
-  //   console.log("Received message data:", { _id, senderId, receiverId, message, image });
-
-  //   // Prevent sending empty messages (no text and no image)
-  //   if ((!message || message.trim() === "") && !image) {
-  //     console.log("Rejected empty message.");
-  //     return;
-  //   }
-
-  //   const newMessage = {
-  //     _id: _id || Date.now().toString(),
-  //     senderId,
-  //     receiverId,
-  //     message: message?.trim(),
-  //     image: image || null,
-  //     createdAt: new Date().toISOString(),
-  //   };
-
-  //   const receiverSocketId = onlineUsers.get(receiverId);
-
-  //   if (receiverSocketId) {
-  //     io.to(receiverSocketId).emit("receive-message", newMessage);
-  //   }
-  // });
-
   socket.on("disconnect", () => {
     console.log(`${email || "User"} (${userId}) disconnected.`);
+
     for (const [id, socketId] of onlineUsers.entries()) {
       if (socketId === socket.id) {
         onlineUsers.delete(id);
         break;
       }
     }
+
     broadcastOnlineUsers();
   });
 
