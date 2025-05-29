@@ -1,9 +1,20 @@
 import { SignInButton, useAuth } from "@clerk/clerk-react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Landing = () => {
-  const { userId } = useAuth();
+  const { userId, isLoaded } = useAuth();
+  const navigate = useNavigate();
 
-  if (userId) return null;
+  useEffect(() => {
+    // ⏩ Automatically redirect to /chat if user is logged in
+    if (isLoaded && userId) {
+      navigate("/chat");
+    }
+  }, [isLoaded, userId, navigate]);
+
+  // 🔄 Wait until auth is loaded
+  if (!isLoaded) return null;
 
   return (
     <div className="min-h-screen bg-base-200 flex items-center justify-center px-4">
@@ -16,7 +27,7 @@ const Landing = () => {
           Please log in to continue using Chatgram.
         </p>
 
-        <SignInButton mode="redirect" forceRedirectUrl="/sign-in">
+        <SignInButton mode="redirect" forceRedirectUrl="/chat">
           <button className="btn btn-primary btn-wide text-lg md:text-xl mt-4 shadow-lg hover:shadow-xl transition">
             Login
           </button>

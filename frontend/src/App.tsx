@@ -1,54 +1,57 @@
 import { Routes, Route } from "react-router-dom";
-import { SignIn, SignUp, SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
+import {
+  SignIn,
+  SignUp,
+  SignedIn,
+  SignedOut,
+  RedirectToSignIn,
+  useUser,
+} from "@clerk/clerk-react";
 import Navbar from "./components/Navbar";
 import Homepage from "./pages/HomePage";
-import { Toaster } from "react-hot-toast";
 import Landing from "./components/Landing";
+import { Toaster } from "react-hot-toast";
 import { SocketProvider } from "./context/SocketContext";
 
-
-
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isLoaded } = useUser();
+  if (!isLoaded) return null;
+
   return (
     <>
       <SignedIn>{children}</SignedIn>
-      <SignedOut><RedirectToSignIn /></SignedOut>
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
     </>
   );
 }
 
 function App() {
-
   return (
-    
-    <>
     <SocketProvider>
-    <Navbar />
-    <Landing />
-    <Routes>
-      
-      <Route path="/sign-in" element={<SignIn routing="path" path="/sign-in" />} />
-      <Route path="/sign-up" element={<SignUp routing="path" path="/sign-up" />} />
-      <Route
-        path="/"
-        element={<ProtectedRoute>
-          <div>
+      <Navbar />
+      <Routes>
+        {/* ✅ Public Landing page shown first */}
+        <Route path="/" element={<Landing />} />
 
-            
-            <Homepage />
+        {/* ✅ Public sign-in and sign-up pages */}
+        <Route path="/sign-in" element={<SignIn routing="path" path="/sign-in" />} />
+        <Route path="/sign-up" element={<SignUp routing="path" path="/sign-up" />} />
 
-          </div>
-
-
-          {/* <UserButton afterSignOutUrl="/sign-in" /> */}
-        </ProtectedRoute>} />
-
-    </Routes><Toaster />
-    </SocketProvider></>
+        {/* ✅ Private chat page */}
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <Homepage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+      <Toaster />
+    </SocketProvider>
   );
 }
 
 export default App;
-
-
-
