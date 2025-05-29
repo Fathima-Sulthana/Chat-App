@@ -1,8 +1,11 @@
 import { X } from "lucide-react";
 import { useChatStore } from "../store/useChatStore";
+import { SocketContext } from "../context/SocketContext"; 
+import { useContext } from "react";
 
 const ChatHeader = () => {
-  const { selectedUser, setSelectedUser, onlineUsers } = useChatStore();
+  const { selectedUser, setSelectedUser } = useChatStore();
+  const { onlineUsers } = useContext(SocketContext);
 
   if (!selectedUser) return null;
 

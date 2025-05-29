@@ -5,7 +5,7 @@ import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { useUser } from "@clerk/clerk-react";
 import { useSocket } from "../hooks/useSocket";
-import { Volume2 } from "lucide-react"; 
+import { Volume2 } from "lucide-react";
 import { speakText } from "../lib/elevenlabs";
 
 function Chat() {
@@ -23,19 +23,16 @@ function Chat() {
     createdAt: string;
   }
 
-  // Scroll to bottom when new messages are added
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Fetch messages when a user is selected
   useEffect(() => {
     if (selectedUser?._id) {
       getMessages(selectedUser._id);
     }
   }, [selectedUser, getMessages]);
 
-  // Listen for incoming messages from socket
   useEffect(() => {
     if (!socket) return;
 
@@ -85,18 +82,22 @@ function Chat() {
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((msg) => {
-  const message = msg as IncomingMessage; // 👈 Type assertion here
+  const message = msg as IncomingMessage;
+  const isSender = message.senderId === user?.id;
+
+  const hasText = !!message.text;
+  const hasImage = !!message.image;
 
   return (
     <div
       key={message._id}
-      className={`chat ${message.senderId === user?.id ? "chat-end" : "chat-start"}`}
+      className={`chat ${isSender ? "chat-end" : "chat-start"}`}
     >
       <div className="chat-image avatar">
         <div className="size-10 rounded-full border">
           <img
             src={
-              message.senderId === user?.id
+              isSender
                 ? user?.imageUrl || "/avatar.png"
                 : selectedUser?.profilePic || "/avatar.png"
             }
@@ -105,26 +106,41 @@ function Chat() {
         </div>
       </div>
       <div className="chat-header mb-1">
-        <time className="text-xs opacity-50 ml-1">{formatMessageTime(message.createdAt)}</time>
+        <time className="text-xs opacity-50 ml-1">
+          {formatMessageTime(message.createdAt)}
+        </time>
       </div>
-      <div className="flex items-center gap-2">
-      <div className="chat-bubble flex flex-col">
-        {message.image && (
-          <img
-            src={message.image}
-            alt="Attachment"
-            className="sm:max-w-[200px] rounded-md mb-2"
-          />
+
+      <div
+        className={`flex items-center gap-2 ${
+          isSender ? "flex-row-reverse" : "flex-row"
+        }`}
+      >
+        {/* Speaker icon only if text exists */}
+        {hasText && (
+          <button
+            onClick={() => speakText(message.text)}
+            className="text-zinc-400 hover:text-primary transition"
+          >
+            <Volume2 className="w-4 h-4" />
+          </button>
         )}
-        {message.text && <p>{message.text}</p>}
-      </div>
-      <button onClick={() => speakText(message.text)} className="text-zinc-400 hover:text-primary transition">
-        <Volume2 className="w-4 h-4" />
-      </button>
+
+        <div className="chat-bubble flex flex-col">
+          {hasImage && (
+            <img
+              src={message.image}
+              alt="Attachment"
+              className="sm:max-w-[200px] rounded-md mb-2"
+            />
+          )}
+          {hasText && <p>{message.text}</p>}
+        </div>
       </div>
     </div>
   );
 })}
+
 
         <div ref={messageEndRef} />
       </div>
