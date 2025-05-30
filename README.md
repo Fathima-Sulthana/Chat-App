@@ -1,11 +1,11 @@
 # Real-Time Chat Application
 
-A modern real-time chat application built with React, TypeScript, Node.js, and Socket.IO. Features include real-time messaging, voice messages using ElevenLabs API, and media sharing capabilities with Cloudinary integration.
+A modern real-time chat application built with React, TypeScript, Node.js, and Socket.IO. Features include real-time messaging, voice playback using ElevenLabs API, and media sharing capabilities with Cloudinary integration.
 
 ## Features
 
 - 💬 Real-time messaging
-- 🎤 Voice message support
+- 🎤 Voice playback
 - 🖼️ Media file sharing
 - 👤 User authentication
 - 🎨 Modern UI with responsive design
